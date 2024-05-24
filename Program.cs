@@ -34,7 +34,7 @@ namespace Restauracja
                         DodajDoMenu();
                         break;
                     case 3:
-                        //UsunPosilek();
+                        UsunZMenu();
                         break;
                     case 4:
                         Console.WriteLine("Do zobaczenia!");
@@ -112,7 +112,7 @@ namespace Restauracja
                         Console.WriteLine("Podaj nazwę posiłku: ");
                         string nazwa = Console.ReadLine(); // odczytanie nazwy posiłku
 
-                        Console.WriteLine("Podaj cenę posiłku: (używając '.')");
+                        Console.WriteLine("Podaj cenę posiłku: (używając ',')");
                         float cena = float.Parse(Console.ReadLine()); // odczytanie ceny posiłku
 
                         posilki.Add(new PosilkiModel
@@ -137,7 +137,7 @@ namespace Restauracja
                         string nazwaD = Console.ReadLine(); // odczytanie nazwy deseru
                         Console.Clear();
 
-                        Console.WriteLine("Podaj cene deseru: (np. 14.99)");
+                        Console.WriteLine("Podaj cene deseru: (np. 14,99)");
                         float cenaD = float.Parse(Console.ReadLine());
                         Console.Clear();
 
@@ -148,6 +148,16 @@ namespace Restauracja
                         Console.WriteLine("Podaj opis deseru: ");
                         string opis = Console.ReadLine();
                         Console.Clear();
+
+                        desery.Add(
+                            new DeserModel
+                            {
+                                ID = (uint)desery.Count + 1,
+                                Nazwa = nazwaD,
+                                Cena = cenaD,
+                                Gramatura = gramatura,
+                                Opis = opis
+                            });
 
                         jsondesery = JsonConvert.SerializeObject(desery);
                         File.WriteAllText("Desery.json", jsondesery);
@@ -165,6 +175,70 @@ namespace Restauracja
                 Environment.Exit(0);
             }
 
+        }
+
+        public static void UsunZMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("Wybierz co chcesz usunąć: \n");
+            Console.WriteLine("Posiłek - wpisz 1");
+            Console.WriteLine("Deser - wpisz 2");
+            //wybór co chcemy usunąć
+
+            switch(int.Parse(Console.ReadLine()))
+            {
+                   case 1:
+                    string jsonposilki = File.ReadAllText("Posilki.json");
+                    List<PosilkiModel> posilki = JsonConvert.DeserializeObject<List<PosilkiModel>>(jsonposilki);
+                    //deserializacja jsona do listy z PosilkiModel
+
+                    Console.WriteLine("Podaj numer dania do usunięcia: ");
+                    uint id = uint.Parse(Console.ReadLine());
+                    //odczytanie numeru dania do usunięcia
+
+                    if (posilki.Exists(x => x.ID == id))// => oznacza że dla każdego elementu x w liście posilki sprawdzamy czy x.ID jest równy id
+                    {
+                        posilki.RemoveAll(x => x.ID == id);
+                        //usunięcie dania z listy
+                        jsonposilki = JsonConvert.SerializeObject(posilki);
+                        File.WriteAllText("Posilki.json", jsonposilki);
+                        //zapisanie zmian w pliku json
+
+                        Console.WriteLine($"Posiłek o numerze {id} został usunięty.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Nie ma takiego dania!");
+                    }
+                    break;
+                case 2:
+                    string jsondesery = File.ReadAllText("Desery.json");
+                    List<DeserModel> desery = JsonConvert.DeserializeObject<List<DeserModel>>(jsondesery);
+                    //deserializacja jsona do listy z DeserModel
+
+                    Console.WriteLine("Podaj numer deseru do usunięcia: ");
+                    uint idD = uint.Parse(Console.ReadLine());
+                    //odczytanie numeru deseru do usunięcia
+
+                    if (desery.Exists(x => x.ID == idD))
+                    {
+                        desery.RemoveAll(x => x.ID == idD);
+                        //usunięcie deseru z listy
+                        jsondesery = JsonConvert.SerializeObject(desery);
+                        File.WriteAllText("Desery.json", jsondesery);
+                        //zapisanie zmian w pliku json
+
+                        Console.WriteLine($"Deser o numerze {idD} został usunięty.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Nie ma takiego deseru!");
+                    }
+                    break;
+                default:
+                    Console.WriteLine("Niepoprawny wybór!");
+                    break;
+            }
         }
 
 
